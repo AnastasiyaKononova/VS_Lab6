@@ -42,7 +42,6 @@ static ssize_t times_store(struct kobject *kobj, struct kobj_attribute *attr,
     if (timer_exists) {
         del_timer(&timer);
     }
-
     timer_exists = 1;
     timer.data = times;
     timer.function = repeat;
