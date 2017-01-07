@@ -1,6 +1,6 @@
 sudo insmod lab6.ko
 
-sudo chmod a+w+r /sys/timer/interval
+sudo chmod 777 /sys/timer/interval
 
 echo "7" > /sys/timer/interval
 
