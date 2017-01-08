@@ -69,6 +69,7 @@ static void func_write_text(unsigned long arg)
     add_timer(&timer);
 }
 
+
 static int __init timer_init()
 {
 
