@@ -1,6 +1,6 @@
-obj-m += hello_timer.o
+obj-m += lab6.o
 
-all:
+default:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
 
 clean:
