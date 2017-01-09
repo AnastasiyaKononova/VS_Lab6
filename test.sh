@@ -1,10 +1,10 @@
 sudo insmod lab6.ko
 
-sudo chmod 777 /sys/timer/interval
+sudo chmod a+w+r /sys/timers/inter
 
-echo "7" > /sys/timer/interval
+echo "#10"
+echo 10 > /sys/timers/inter
 
 sleep 10
-echo 0 > /sys/timer/interval
+echo 0 > /sys/timers/inter
 
-sudo rmmod lab6
