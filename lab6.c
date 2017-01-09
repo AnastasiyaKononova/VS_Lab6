@@ -95,7 +95,7 @@ static int __init timer_init()
     return 0;
 }
 
-static void timer_exit()
+static void __exit timer_exit()
 {
     if (timer_exists) 
     {
