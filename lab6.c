@@ -36,13 +36,11 @@ static ssize_t times_show(struct kobject *kobj, struct kobj_attribute *attr, cha
 
 static ssize_t times_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t count)
 {
-    if (kstrtoul(buf, 10, &times) == -EINVAL) 
-    {
+    if (kstrtoul(buf, 10, &times) == -EINVAL) {
         return -EINVAL;
     }
 
-    if (timer_exists) 
-    {
+    if (timer_exists) {
         del_timer(&timer);
     }
     timer_exists = 1;
@@ -59,13 +57,11 @@ static void func_write_text(unsigned long arg)
 {
     unsigned long i = 0;
 
-    if (!arg) 
-    {
+    if (!arg) {
         return;
     }
 
-    for (i = 0; i < arg; ++i) 
-    {
+    for (i = 0; i < arg; ++i) {
         printk(KERN_INFO "%s\n", TEXT);
     }
 
@@ -77,17 +73,14 @@ static void func_write_text(unsigned long arg)
 
 static int __init timer_init()
 {
-
     init_timer_on_stack(&timer);
 
     times_obj = kobject_create_and_add("timers", NULL);
-    if (!times_obj) 
-    {
+    if (!times_obj) {
         return -ENOMEM;
     }
 
-    if (sysfs_create_file(times_obj, &times_attrb.attr)) 
-    {
+    if (sysfs_create_file(times_obj, &times_attrb.attr)) {
         timer_exit();
         return -EINVAL;
     }
@@ -97,13 +90,11 @@ static int __init timer_init()
 
 static void __exit timer_exit()
 {
-    if (timer_exists) 
-    {
+    if (timer_exists) {
         del_timer(&timer);
     }
 
-    if (times_obj) 
-    {
+    if (times_obj) {
         kobject_put(times_obj);
     }
 }
