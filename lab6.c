@@ -9,46 +9,48 @@
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Kononova_Anastasiya");
 
-static unsigned long times = 0;
-static unsigned char timer_exists = 0;
+static unsigned long time = 0;
+static unsigned char is_exists_timer = 0;
 
-static int timer_init(void);
-static void timer_exit(void);
+static int init_func_time(void);
+static void exit_func_time(void);
 
-static ssize_t times_show(struct kobject *, struct kobj_attribute *, char *);
-static ssize_t times_store(struct kobject *, struct kobj_attribute *, const char *, size_t);
+static ssize_t func_show_time(struct kobject *, struct kobj_attribute *, char *);
+static ssize_t func_store_time(struct kobject *, struct kobj_attribute *, const char *, size_t);
 
-static struct timer_list timer;
+static struct timer_list list_timer;
 
-static struct kobject *times_obj = NULL;
+static struct kobject *kobj_time = NULL;
 
 static void func_write_text(unsigned long);
 
-static struct kobj_attribute times_attrb =
-    __ATTR(inter, 0664, times_show, times_store);
+static struct kobj_attribute attribute_time =
+    __ATTR(inter, 0664, func_show_time, func_store_time);
 
 
 
-static ssize_t times_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
+static ssize_t func_show_time(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
-    return sprintf(buf, "%lu\n", times);
+    return sprintf(buf, "%lu\n", time);
 }
 
-static ssize_t times_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t count)
+static ssize_t func_store_time(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t count)
 {
-    if (kstrtoul(buf, 10, &times) == -EINVAL) {
+    if (kstrtoul(buf, 10, &time) == -EINVAL) {
         return -EINVAL;
     }
 
-    if (timer_exists) {
-        del_timer(&timer);
+    if (is_exists_timer) {
+        del_timer(&list_timer);
     }
-    timer_exists = 1;
-    timer.data = times;
-    timer.function = func_write_text;
-    timer.expires = jiffies + DELAY * HZ;
 
-    add_timer(&timer);
+    list_timer.data = time;
+    list_timer.function = func_write_text;
+    list_timer.expires = jiffies + DELAY * HZ;
+
+    is_exists_timer = 1;
+
+    add_timer(&list_timer);
 
     return count;
 }
@@ -65,40 +67,40 @@ static void func_write_text(unsigned long arg)
         printk(KERN_INFO "%s\n", TEXT);
     }
 
-    timer.expires = jiffies + DELAY * HZ;
+    list_timer.expires = jiffies + DELAY * HZ;
 
-    add_timer(&timer);
+    add_timer(&list_timer);
 }
 
 
-static int __init timer_init()
+static int __init init_func_time()
 {
-    init_timer_on_stack(&timer);
+    init_timer_on_stack(&list_timer);
 
-    times_obj = kobject_create_and_add("timers", NULL);
-    if (!times_obj) {
+    kobj_time = kobject_create_and_add("timers", NULL);
+    if (!kobj_time) {
         return -ENOMEM;
     }
 
-    if (sysfs_create_file(times_obj, &times_attrb.attr)) {
-        timer_exit();
+    if (sysfs_create_file(kobj_time, &attribute_time.attr)) {
+        exit_func_time();
         return -EINVAL;
     }
 
     return 0;
 }
 
-static void __exit timer_exit()
+static void __exit exit_func_time()
 {
-    if (timer_exists) {
-        del_timer(&timer);
+    if (is_exists_timer) {
+        del_timer(&list_timer);
     }
 
-    if (times_obj) {
-        kobject_put(times_obj);
+    if (kobj_time) {
+        kobject_put(kobj_time);
     }
 }
 
-module_init(timer_init);
-module_exit(timer_exit);
+module_init(init_func_time);
+module_exit(exit_func_time);
 
